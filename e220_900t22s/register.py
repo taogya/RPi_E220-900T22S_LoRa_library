@@ -4,9 +4,9 @@ import typing as typ
 from RPi_GPIO_Helper import Pin
 
 from e220_900t22s import calc_rssi
-from e220_900t22s.enums import (SerialPortRateChoices, AirDataRateChoices,
-                                SubPacketLengthChoices, TxPowerChoices,
-                                TxMethodChoices, WORCycleChoices)
+from e220_900t22s.enums import (AirDataRateChoices, SerialPortRateChoices,
+                                SubPacketLengthChoices, TxMethodChoices,
+                                TxPowerChoices, WORCycleChoices)
 
 
 class Register(typ.NamedTuple):
@@ -147,9 +147,9 @@ class Register(typ.NamedTuple):
 
 class ExtendRegister(typ.NamedTuple):
     # 現在のRSSI環境ノイズ
-    now_rssi: int
+    now_rssi: int = 0
     # 前回のRSSI
-    before_rssi: int
+    before_rssi: int = 0
 
     @classmethod
     def parse(cls, data: bytes) -> 'ExtendRegister':

@@ -95,3 +95,7 @@ class Mode(IntEnum):
     WOR_SEND = auto()
     WOR_RECV = auto()
     SLEEP = auto()
+
+    @classmethod
+    def parse(cls, m0, m1):
+        return Mode(m1 << 1 | m0)

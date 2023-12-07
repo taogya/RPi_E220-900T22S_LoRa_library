@@ -2,14 +2,16 @@ import threading
 import time
 import typing as typ
 
-from serial import Serial
 from RPi_GPIO_Helper import GPIO, Pin
-from e220_900t22s.register import Register
-from e220_900t22s.enums import TxMethodChoices, Mode
+from serial import Serial
+
+from e220_900t22s import calc_rssi
+from e220_900t22s.enums import Mode, TxMethodChoices
+from e220_900t22s.register import ExtendRegister, Register
 
 
 class E220_900T22S:
-    SLEEP = 0.1
+    SLEEP = 0.2
     MODES = {
         Mode.NORMAL: (False, False),
         Mode.WOR_SEND: (False, True),
@@ -32,12 +34,19 @@ class E220_900T22S:
         self.__m1: Pin = m1
         self.__aux: Pin = aux
         self.__mutex = threading.RLock()
+        self.__mode = Mode.parse(m0.initial, m1.initial)
+        self
+        time.sleep(self.SLEEP)
+
+    @property
+    def mode(self):
+        return self.__mode
 
     def __del__(self):
-       self.__ser.close()
+        self.__ser.close()
 
     def __exit__(self):
-       self.__ser.close()
+        self.__ser.close()
 
     def mutex_func(self, func: typ.Callable, *args, **kwargs) -> typ.Any:
         ret = None
@@ -55,6 +64,7 @@ class E220_900T22S:
         m0, m1 = self.MODES[mode]
 
         def func():
+            self.mode = Mode.parse(m0, m1)
             self.__m0.output(m0)
             self.__m1.output(m1)
             time.sleep(self.SLEEP)
@@ -101,14 +111,26 @@ class E220_900T22S:
 
         return ret
 
+    def get_rssi(self, data: bytes):
+        return self.__reg.rssi_byte_enable and calc_rssi(data[-1])
+
     def configure(self) -> bool:
-        print(self.__reg)
         wdata = bytes([0xc0, 0x00, 0x08]) + self.__reg.to_data()
-        print(wdata)
         self.change_mode(Mode.SLEEP)
         wlen = self.write(wdata)
         rdata = self.read(len(wdata))
-        print(rdata)
         res = wlen == len(rdata)
 
         return res
+
+    def read_ex_reg(self) -> ExtendRegister:
+        ret = ExtendRegister(0, 0)
+        if not (self.__reg.rssi_noise_enable or (self.mode in [Mode.NORMAL, Mode.WOR_SEND])):
+            return ret
+        wdata = bytes([0xc0, 0xc1, 0xc2, 0xc3])
+        wlen = self.write(wdata)
+        rdata = self.read(len(wdata))
+        if wlen == len(rdata):
+            ret = ExtendRegister.parse(rdata)
+
+        return ret
