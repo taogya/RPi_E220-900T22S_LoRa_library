@@ -98,4 +98,20 @@ class Mode(IntEnum):
 
     @classmethod
     def parse(cls, m0, m1):
-        return Mode(m1 << 1 | m0)
+        MODES = {
+            (False, False): Mode.NORMAL,
+            (False, True): Mode.WOR_SEND,
+            (True, False): Mode.WOR_RECV,
+            (True, True): Mode.SLEEP,
+        }
+        return MODES[(m1, m0)]
+
+    def pins(self):
+        MODES = {
+            Mode.NORMAL: (False, False),
+            Mode.WOR_SEND: (False, True),
+            Mode.WOR_RECV: (True, False),
+            Mode.SLEEP: (True, True),
+        }
+
+        return MODES[self]

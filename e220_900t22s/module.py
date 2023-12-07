@@ -12,12 +12,6 @@ from e220_900t22s.register import ExtendRegister, Register
 
 class E220_900T22S:
     SLEEP = 0.2
-    MODES = {
-        Mode.NORMAL: (False, False),
-        Mode.WOR_SEND: (False, True),
-        Mode.WOR_RECV: (True, False),
-        Mode.SLEEP: (True, True),
-    }
 
     @classmethod
     def create(cls, register: Register, ser_name: str, m0_pin: int, m1_pin: int, aux_pin: int, timeout=SLEEP, pull_up_down=GPIO.PUD_OFF, **kwargs):
@@ -61,10 +55,9 @@ class E220_900T22S:
         return ret
 
     def change_mode(self, mode: Mode):
-        m0, m1 = self.MODES[mode]
-
         def func():
-            self.mode = Mode.parse(m0, m1)
+            self.mode = mode
+            m0, m1 = mode.pins()
             self.__m0.output(m0)
             self.__m1.output(m1)
             time.sleep(self.SLEEP)
