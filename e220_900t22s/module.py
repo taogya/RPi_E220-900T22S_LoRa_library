@@ -56,7 +56,7 @@ class E220_900T22S:
 
     def change_mode(self, mode: Mode):
         def func():
-            self.mode = mode
+            self.__mode = mode
             m0, m1 = mode.pins()
             self.__m0.output(m0)
             self.__m1.output(m1)
@@ -118,7 +118,7 @@ class E220_900T22S:
 
     def read_ex_reg(self) -> ExtendRegister:
         ret = ExtendRegister(0, 0)
-        if not (self.__reg.rssi_noise_enable or (self.mode in [Mode.NORMAL, Mode.WOR_SEND])):
+        if not (self.__reg.rssi_noise_enable or (self.__mode in [Mode.NORMAL, Mode.WOR_SEND])):
             return ret
         wdata = bytes([0xc0, 0xc1, 0xc2, 0xc3])
         wlen = self.write(wdata)
