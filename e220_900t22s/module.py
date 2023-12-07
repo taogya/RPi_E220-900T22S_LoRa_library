@@ -1,18 +1,12 @@
 import threading
 import time
 import typing as typ
-from enum import IntEnum, auto
 
 from serial import Serial
 from RPi_GPIO_Helper import GPIO, Pin
 from e220_900t22s.register import Register
-from e220_900t22s.enums import TxMethodChoices
+from e220_900t22s.enums import TxMethodChoices, Mode
 
-class Mode(IntEnum):
-    NORMAL = auto()
-    WOR_SEND = auto()
-    WOR_RECV = auto()
-    SLEEP = auto()
 
 class E220_900T22S:
     SLEEP = 0.1
@@ -38,6 +32,12 @@ class E220_900T22S:
         self.__m1: Pin = m1
         self.__aux: Pin = aux
         self.__mutex = threading.RLock()
+
+    def __del__(self):
+       self.__ser.close()
+
+    def __exit__(self):
+       self.__ser.close()
 
     def mutex_func(self, func: typ.Callable, *args, **kwargs) -> typ.Any:
         ret = None
@@ -88,14 +88,14 @@ class E220_900T22S:
         def func(size):
             return self.__ser.read(size)
 
+        max_len = self.__reg.sub_packet_length
+        read_len = read_len or max_len
+        if max_len < read_len:
+            raise ValueError(f'exceeded max length. max {max_len}, in {read_len}.')
+
         ret = bytes()
         try:
-            if (read_len is None):
-                while (len(ret) < self.__reg.sub_packet_length.num):
-                    ret = ret + self.mutex_func(func, 1)
-                    time.sleep(0.001)
-            else:
-                ret = self.mutex_func(func, read_len)
+            ret = self.mutex_func(func, read_len)
         except BaseException:
             pass
 

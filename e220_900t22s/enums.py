@@ -1,4 +1,7 @@
 
+import re
+from enum import IntEnum, auto
+
 from .base_enums import IntegerChoices
 
 
@@ -85,3 +88,10 @@ class WORCycleChoices(IntegerChoices):
     @property
     def num(self):
         return get_num_only(self.label)
+
+
+class Mode(IntEnum):
+    NORMAL = auto()
+    WOR_SEND = auto()
+    WOR_RECV = auto()
+    SLEEP = auto()

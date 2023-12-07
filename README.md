@@ -22,12 +22,20 @@ from e220_900t22s.module import E220_900T22S
 from e220_900t22s.register import Register
 from e220_900t22s.enums import (SerialPortRateChoices, AirDataRateChoices, 
                                 SubPacketLengthChoices, TxPowerChoices, 
-                                TxMethodChoices, WORCycleChoices)
+                                TxMethodChoices, WORCycleChoices, Mode)
 from RPi_GPIO_Helper import GPIO
 
-GPIO.cleanup()
+# Port Initialize
+dev = '/dev/ttyS0'
+m0 = 23
+m1 = 24
+aux = 25
+GPIO.cleanup(m0)
+GPIO.cleanup(m1)
+GPIO.cleanup(aux)
 GPIO.setmode(GPIO.BCM)
 
+# Register Setting
 reg = Register(
     address=0x0000,
     serial_port_rate=SerialPortRateChoices.BPS9600,
@@ -41,13 +49,7 @@ reg = Register(
     wor_cycle=WORCycleChoices.MS2000,
     crypt_key=0x0000,
 )
-module = E220_900T22S.create(
-    reg,
-    '/dev/ttyS0',
-    23,
-    24,
-    25,
-)
+module = E220_900T22S.create(reg, dev, m0, m1, aux)
 module.configure()
 
 ```
