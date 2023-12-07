@@ -6,7 +6,7 @@ from .base_enums import IntegerChoices
 
 
 def get_num_only(s: str):
-    return re.sub(r'\D', '', s)
+    return int(re.sub(r'\D', '', s))
 
 
 class SerialPortRateChoices(IntegerChoices):
