@@ -91,7 +91,7 @@ class E220_900T22S:
         def func(size):
             return self.__ser.read(size)
 
-        max_len = self.__reg.sub_packet_length
+        max_len = self.__reg.sub_packet_length.num
         read_len = read_len or max_len
         if max_len < read_len:
             raise ValueError(f'exceeded max length. max {max_len}, in {read_len}.')
