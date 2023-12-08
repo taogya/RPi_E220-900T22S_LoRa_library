@@ -51,14 +51,15 @@ reg = Register(
 )
 module = E220_900T22S.create(reg, dev, m0, m1, aux)
 module.configure()
-
-# Receiver
 module.change_mode(Mode.NORMAL)
-while True:
-    ret = module.read()
-    print(ret)
 
 # Sender
-module.change_mode(Mode.NORMAL)
-ret = module.send(bytes('Hello world'))
+ret = module.send(0x0000, 0, bytes('Hello world'))
+
+# Receiver
+ret = module.read()
+print(ret)
+
+module.change_mode(Mode.SLEEP)
+module.close()
 ```

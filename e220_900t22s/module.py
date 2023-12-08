@@ -1,3 +1,4 @@
+import re
 import threading
 import time
 import typing as typ
@@ -37,10 +38,21 @@ class E220_900T22S:
         return self.__mode
 
     def __del__(self):
-        self.__ser.close()
+        self.close()
 
-    def __exit__(self):
+    def __enter__(self):
+        self.configure()
+        self.change_mode(Mode.NORMAL)
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        self.change_mode(Mode.SLEEP)
+        self.close()
+
+    def close(self):
         self.__ser.close()
+        self.__m0.cleanup()
+        self.__m1.cleanup()
+        self.__aux.cleanup()
 
     def mutex_func(self, func: typ.Callable, *args, **kwargs) -> typ.Any:
         ret = None
@@ -99,6 +111,8 @@ class E220_900T22S:
         ret = bytes()
         try:
             ret = self.mutex_func(func, read_len)
+            if self.__reg.tx_method == TxMethodChoices.FIX:
+                ret = ret[3:]
         except BaseException:
             pass
 
@@ -110,9 +124,9 @@ class E220_900T22S:
     def configure(self) -> bool:
         wdata = bytes([0xc0, 0x00, 0x08]) + self.__reg.to_data()
         self.change_mode(Mode.SLEEP)
-        wlen = self.write(wdata)
+        self.write(wdata)
         rdata = self.read(len(wdata))
-        res = wlen == len(rdata)
+        res = re.match(r'c10008[0-9a-f]{8 * 2}', rdata.hex(), flags=re.IGNORECASE)
 
         return res
 
@@ -120,10 +134,10 @@ class E220_900T22S:
         ret = ExtendRegister(0, 0)
         if not (self.__reg.rssi_noise_enable or (self.__mode in [Mode.NORMAL, Mode.WOR_SEND])):
             return ret
-        wdata = bytes([0xc0, 0xc1, 0xc2, 0xc3])
-        wlen = self.write(wdata)
+        wdata = bytes([0xc0, 0xc1, 0xc2, 0xc3, 0x00, 0x02])
+        self.write(wdata)
         rdata = self.read(len(wdata))
-        if wlen == len(rdata):
-            ret = ExtendRegister.parse(rdata)
+        if re.match(r'c10002[0-9a-f]{2 * 2}', rdata.hex(), flags=re.IGNORECASE):
+            ret = ExtendRegister.parse(rdata[3:])
 
         return ret

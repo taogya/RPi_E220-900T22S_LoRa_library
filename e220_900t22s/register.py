@@ -122,10 +122,6 @@ class Register(typ.NamedTuple):
 
     @classmethod
     def parse(cls, data: bytes) -> 'Register':
-        expect_len = 8
-        if (len(data) < expect_len):
-            raise ValueError(f'bytes len is not enough. expect {expect_len}, in {len(data)}')
-
         obj = Register(
             address=data[0] << 8 | data[1],
             serial_port_rate=SerialPortRateChoices(data[2] >> 5),
@@ -153,10 +149,6 @@ class ExtendRegister(typ.NamedTuple):
 
     @classmethod
     def parse(cls, data: bytes) -> 'ExtendRegister':
-        expect_len = 2
-        if (len(data) < expect_len):
-            raise ValueError(f'bytes len is not enough. expect {expect_len}, in {len(data)}')
-
         obj = ExtendRegister(
             now_rssi=calc_rssi(data[0]),
             before_rssi=calc_rssi(data[1]),
