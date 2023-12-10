@@ -43,6 +43,7 @@ class E220_900T22S:
     def __enter__(self):
         self.configure()
         self.change_mode(Mode.NORMAL)
+        return self
 
     def __exit__(self, exc_type, exc_value, traceback):
         self.change_mode(Mode.SLEEP)
