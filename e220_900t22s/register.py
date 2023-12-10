@@ -43,11 +43,11 @@ class Register(typ.NamedTuple):
 
     @property
     def REG0(self):
-        return self.serial_port_rate.value << 5 | self.air_data_rate.value
+        return self.serial_port_rate << 5 | self.air_data_rate
 
     @property
     def REG1(self):
-        return self.sub_packet_length.value << 6 | self.rssi_noise_enable << 5 | self.tx_power.value
+        return self.sub_packet_length << 6 | self.rssi_noise_enable << 5 | self.tx_power
 
     @property
     def REG2(self):
@@ -55,7 +55,7 @@ class Register(typ.NamedTuple):
 
     @property
     def REG3(self):
-        return self.rssi_byte_enable << 7 | self.tx_method.value << 6 | self.wor_cycle.value
+        return self.rssi_byte_enable << 7 | self.tx_method << 6 | self.wor_cycle
 
     @property
     def CRYPT_H(self):
