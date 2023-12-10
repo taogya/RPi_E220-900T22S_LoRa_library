@@ -19,7 +19,7 @@ classifiers = [
 ]
 dependencies = [
     "pyserial >= 3.5",
-    "RPi-GPIO-Helper >= 2.2.0",
+    "RPi-GPIO-Helper >= 2.2.1",
 ]
 
 [tool.hatch.build]
