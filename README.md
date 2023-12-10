@@ -9,6 +9,8 @@ pip install rpi-e220-900t22s-lora-library
 # Example
 ```sh
 # uart setup
+sudo usermod -aG dialout <username>
+sudo usermod -aG gpio <username>
 sudo raspi-config
     -> Interface Options
     -> Serial Port
