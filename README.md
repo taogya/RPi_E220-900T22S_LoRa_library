@@ -3,7 +3,7 @@ E220-900T22S Python Library for Raspberry Pi
 
 # Installation
 ```
-pip install rpi-e220-900t22s-lora-library
+pip install e220-900t22s
 ```
 
 # Example
