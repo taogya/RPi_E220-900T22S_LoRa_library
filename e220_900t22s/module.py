@@ -90,7 +90,7 @@ class E220_900T22S:
         return self.mutex_func(func)
 
     def send(self, address: int, channel: int, data: bytes) -> int:
-        addh = address & 0xff00 >> 8
+        addh = address >> 8
         addl = address & 0x00ff
         prefix_data = {
             TxMethodChoices.TRANSPARENT: bytes(),
@@ -112,8 +112,6 @@ class E220_900T22S:
         ret = bytes()
         try:
             ret = self.mutex_func(func, read_len)
-            if self.__reg.tx_method == TxMethodChoices.FIX:
-                ret = ret[3:]
         except BaseException:
             pass
 
