@@ -1,5 +1,8 @@
 # RPi_E220-900T22S_LoRa_library
 E220-900T22S Python Library for Raspberry Pi
+> [!NOTE] 
+> It is specifically for Dragon-Torch. <br>
+> https://dragon-torch.tech/rf-modules/lora/e220-900t22s-jp/
 
 # Installation
 ```
